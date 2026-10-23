@@ -17,6 +17,22 @@ from ..services.core import (
 router = APIRouter(prefix="/api", tags=["Core security"])
 
 
+@router.get("/actions", dependencies=[Depends(require_operator)])
+def action_records(task_id: str, db=Depends(get_db)):
+    """Read-only evidence for the UI; controlled tool outputs are not exposed."""
+    from ..models import Action
+
+    require_task(db, task_id)
+    rows = db.scalars(select(Action).where(Action.task_id == task_id).limit(500))
+    items = []
+    for row in rows:
+        record = serialize(row)
+        record.pop("result", None)
+        record.pop("idempotency_key", None)
+        items.append(record)
+    return {"items": items}
+
+
 @router.get("/agents", dependencies=[Depends(require_operator)])
 def agents(db=Depends(get_db)):
     return {"items": [serialize(a) for a in db.scalars(select(Agent))]}
