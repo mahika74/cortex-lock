@@ -1,0 +1,85 @@
+{
+  "version": "1.0",
+  "core": [
+    [
+      "GET /api/health",
+      "Public",
+      "{status, contract_version, agent_ready, model_configured}"
+    ],
+    [
+      "GET /api/agents",
+      "Operator",
+      "{items: Agent[]}"
+    ],
+    [
+      "POST /api/tasks",
+      "Operator",
+      "{agent_id, template_id} -> Task; HTTP 201"
+    ],
+    [
+      "GET /api/tasks/{task_id}",
+      "Operator",
+      "Task with trusted resource and recipient boundaries"
+    ],
+    [
+      "POST /api/actions/evaluate",
+      "Operator or internal",
+      "ActionRequest -> ActionResult; HTTP 200"
+    ],
+    [
+      "POST /api/actions/execute",
+      "Operator or internal",
+      "{action_id} -> ActionResult; HTTP 200"
+    ],
+    [
+      "GET /api/approvals?task_id=...",
+      "Operator",
+      "{items: Approval[]}"
+    ],
+    [
+      "POST /api/approvals/{id}/decision",
+      "Reviewer",
+      "{decision: ALLOW_ONCE | DENY} -> Approval"
+    ],
+    [
+      "GET /api/events?task_id=...",
+      "Operator",
+      "{items: Event[]}; oldest first, capped at 500"
+    ],
+    [
+      "GET /api/outbox?task_id=...",
+      "Operator",
+      "{items: OutboxMessage[]}; redacted previews"
+    ]
+  ],
+  "intelligence": [
+    [
+      "POST /api/documents",
+      "{task_id, name, content} -> Source; HTTP 201"
+    ],
+    [
+      "POST /api/runs",
+      "{task_id, scenario, mode} -> Run; HTTP 202"
+    ],
+    [
+      "GET /api/runs/{run_id}",
+      "Run including status, step_count, output and error"
+    ],
+    [
+      "POST /api/runs/{run_id}/resume",
+      "{} -> Run; HTTP 202; resume reviewed action once"
+    ],
+    [
+      "POST /api/memories/evaluate",
+      "MemoryRequest -> Memory with gate outcome"
+    ],
+    [
+      "GET /api/memories?agent_id=...",
+      "{items: Memory[]}; inspectable statuses and lineage"
+    ],
+    [
+      "GET /api/memories/retrieve?task_id=...",
+      "{items: Memory[]}; safe scoped retrieval only"
+    ]
+  ]
+}
