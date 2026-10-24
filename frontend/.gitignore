@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env*
+!.env.example
+
+qa/
+__qa__*.html
+__qa*.html
